@@ -1,5 +1,10 @@
 function logger(req, res, next) {
   // SİHRİNİZİ GÖRELİM
+  let timestamp = new Date().toLocaleString();
+  let url = req.originalUrl;
+  let method = req.method;
+  console.log(`${timestamp} -- ${method} -- ${url}`);
+  next();
 }
 
 function validateUserId(req, res, next) {
@@ -15,3 +20,5 @@ function validatePost(req, res, next) {
 }
 
 // bu işlevleri diğer modüllere değdirmeyi unutmayın
+
+module.exports = { logger };
