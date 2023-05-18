@@ -1,5 +1,6 @@
 const express = require("express");
 const userModel = require("../users/users-model");
+const postsModel = require("../posts/posts-model");
 const mw = require("../middleware/middleware");
 
 // `users-model.js` ve `posts-model.js` sayfalarına ihtiyacınız var
@@ -7,15 +8,15 @@ const mw = require("../middleware/middleware");
 
 const router = express.Router();
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   // TÜM KULLANICILARI İÇEREN DİZİYİ DÖNDÜRÜN
   try {
-    const users = userModel.get();
+    const users = await userModel.get();
     res.json(users);
   } catch (error) {}
 });
 
-router.get("/:id", mw.validateUserId, async (req, res, next) => {
+router.get("/:id", mw.validateUserId, (req, res, next) => {
   // USER NESNESİNİ DÖNDÜRÜN
   // user id yi getirmek için bir ara yazılım gereklidir
   try {
@@ -25,31 +26,68 @@ router.get("/:id", mw.validateUserId, async (req, res, next) => {
   }
 });
 
-router.post("/", (req, res) => {
+router.post("/", mw.validateUser, async (req, res, next) => {
   // YENİ OLUŞTURULAN USER NESNESİNİ DÖNDÜRÜN
   // istek gövdesini doğrulamak için ara yazılım gereklidir.
+  try {
+    const insertedUser = await userModel.insert(req.newUser);
+    res.json(insertedUser);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.put("/:id", (req, res) => {
+router.put("/:id", mw.validateUserId, mw.validateUser, async (req, res) => {
   // YENİ GÜNCELLENEN USER NESNESİNİ DÖNDÜRÜN
   // user id yi doğrulayan ara yazılım gereklidir
   // ve istek gövdesini doğrulayan bir ara yazılım gereklidir.
+  try {
+    const updatedUSer = await userModel.update(req.params.id, req.newUser);
+    res.json(updatedUSer);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.delete("/:id", (req, res) => {
+router.delete("/:id", mw.validateUserId, async (req, res, next) => {
   // SON SİLİNEN USER NESNESİ DÖNDÜRÜN
   // user id yi doğrulayan bir ara yazılım gereklidir.
+  try {
+    const deletedUser = await userModel.remove(req.params.id);
+    res.json(deletedUser);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get("/:id/posts", (req, res) => {
+router.get("/:id/posts", mw.validateUserId, async (req, res, next) => {
   // USER POSTLARINI İÇEREN BİR DİZİ DÖNDÜRÜN
   // user id yi doğrulayan bir ara yazılım gereklidir.
+  try {
+    const userPosts = await postsModel.getById(req.params.id);
+    res.json(userPosts);
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.post("/:id/posts", (req, res) => {
-  // YENİ OLUŞTURULAN KULLANICI NESNESİNİ DÖNDÜRÜN
-  // user id yi doğrulayan bir ara yazılım gereklidir.
-  // ve istek gövdesini doğrulayan bir ara yazılım gereklidir.
-});
+router.post(
+  "/:id/posts",
+  mw.validateUserId,
+  mw.validatePost,
+  async (req, res, next) => {
+    // YENİ OLUŞTURULAN KULLANICI NESNESİNİ DÖNDÜRÜN
+    // user id yi doğrulayan bir ara yazılım gereklidir.
+    // ve istek gövdesini doğrulayan bir ara yazılım gereklidir.
+    try {
+      const insertedPost = await postsModel.insert(req.newPost);
+      res.json(insertedPost);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+module.exports = router;
 
 // routerı dışa aktarmayı unutmayın

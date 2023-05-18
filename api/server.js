@@ -1,5 +1,6 @@
 const express = require("express");
 const mw = require("./middleware/middleware");
+const usersRouter = require("../api/users/users-router");
 
 const server = express();
 
@@ -13,5 +14,7 @@ server.use(mw.logger);
 server.get("/", (req, res) => {
   res.send(`<h2>Biraz ara yazılım yazalım!</h2>`);
 });
+
+server.use("/api/users/", usersRouter);
 
 module.exports = server;

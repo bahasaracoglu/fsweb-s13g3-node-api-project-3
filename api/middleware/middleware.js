@@ -26,12 +26,34 @@ async function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // SİHRİNİZİ GÖRELİM
+  const { name } = req.body;
+  try {
+    if (!name) {
+      res.status(400).json({ mesaj: "gerekli text alanı eksik" });
+    } else {
+      req.newUser = name;
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
 }
 
 function validatePost(req, res, next) {
   // SİHRİNİZİ GÖRELİM
+  const post = req.body.text;
+  try {
+    if (!post) {
+      res.status(400).json({ mesaj: "gerekli text alanı eksik" });
+    } else {
+      req.newPost = post;
+      next();
+    }
+  } catch (error) {
+    next(error);
+  }
 }
 
 // bu işlevleri diğer modüllere değdirmeyi unutmayın
 
-module.exports = { logger, validateUserId };
+module.exports = { logger, validateUserId, validateUser, validatePost };
