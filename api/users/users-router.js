@@ -30,7 +30,7 @@ router.post("/", mw.validateUser, async (req, res, next) => {
   // YENİ OLUŞTURULAN USER NESNESİNİ DÖNDÜRÜN
   // istek gövdesini doğrulamak için ara yazılım gereklidir.
   try {
-    const insertedUser = await userModel.insert(req.newUser);
+    const insertedUser = await userModel.insert({ name: req.body.name });
     res.json(insertedUser);
   } catch (error) {
     next(error);
@@ -42,7 +42,9 @@ router.put("/:id", mw.validateUserId, mw.validateUser, async (req, res) => {
   // user id yi doğrulayan ara yazılım gereklidir
   // ve istek gövdesini doğrulayan bir ara yazılım gereklidir.
   try {
-    const updatedUSer = await userModel.update(req.params.id, req.newUser);
+    const updatedUSer = await userModel.update(req.params.id, {
+      name: req.body.name,
+    });
     res.json(updatedUSer);
   } catch (error) {
     next(error);
@@ -80,7 +82,7 @@ router.post(
     // user id yi doğrulayan bir ara yazılım gereklidir.
     // ve istek gövdesini doğrulayan bir ara yazılım gereklidir.
     try {
-      const insertedPost = await postsModel.insert(req.newPost);
+      const insertedPost = await postsModel.insert(req.body.text);
       res.json(insertedPost);
     } catch (error) {
       next(error);
