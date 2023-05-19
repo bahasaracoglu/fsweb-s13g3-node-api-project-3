@@ -14,7 +14,7 @@ async function validateUserId(req, res, next) {
   try {
     const user = await userModel.getById(req.params.id);
     if (!user) {
-      res.status(404).json({ mesaj: "kullanıcı bulunamadı" });
+      res.status(404).json({ message: "not found" });
     } else {
       req.currentUser = user; // burada currentUser yerine istediğini yazabilirsin. Amaç user'a zaten ulaştığımızdan DB'e tekrardan gidilmesini engellemek.
       next();
@@ -26,12 +26,11 @@ async function validateUserId(req, res, next) {
 
 function validateUser(req, res, next) {
   // SİHRİNİZİ GÖRELİM
-  const { name } = req.body;
+  let { name } = req.body;
   try {
     if (!name) {
-      res.status(400).json({ mesaj: "gerekli text alanı eksik" });
+      res.status(400).json({ message: "eksik" });
     } else {
-      req.newUser = name;
       next();
     }
   } catch (error) {
@@ -44,7 +43,7 @@ function validatePost(req, res, next) {
   const post = req.body.text;
   try {
     if (!post) {
-      res.status(400).json({ mesaj: "gerekli text alanı eksik" });
+      res.status(400).json({ message: "gerekli text alanı eksik" });
     } else {
       req.newPost = post;
       next();

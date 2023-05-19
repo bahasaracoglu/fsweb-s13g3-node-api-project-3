@@ -55,8 +55,8 @@ router.delete("/:id", mw.validateUserId, async (req, res, next) => {
   // SON SİLİNEN USER NESNESİ DÖNDÜRÜN
   // user id yi doğrulayan bir ara yazılım gereklidir.
   try {
-    const deletedUser = await userModel.remove(req.params.id);
-    res.json(deletedUser);
+    await userModel.remove(req.params.id);
+    res.json(req.currentUser);
   } catch (error) {
     next(error);
   }
@@ -66,8 +66,8 @@ router.get("/:id/posts", mw.validateUserId, async (req, res, next) => {
   // USER POSTLARINI İÇEREN BİR DİZİ DÖNDÜRÜN
   // user id yi doğrulayan bir ara yazılım gereklidir.
   try {
-    const userPosts = await postsModel.getById(req.params.id);
-    res.json(userPosts);
+    const allUserPosts = await userModel.getUserPosts(req.params.id);
+    res.json(allUserPosts);
   } catch (error) {
     next(error);
   }
@@ -82,7 +82,10 @@ router.post(
     // user id yi doğrulayan bir ara yazılım gereklidir.
     // ve istek gövdesini doğrulayan bir ara yazılım gereklidir.
     try {
-      const insertedPost = await postsModel.insert(req.body.text);
+      const insertedPost = await postsModel.insert({
+        user_id: req.params.id,
+        text: req.body.text,
+      });
       res.json(insertedPost);
     } catch (error) {
       next(error);
